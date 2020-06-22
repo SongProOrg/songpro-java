@@ -41,5 +41,29 @@ public class SongProTest {
       assertThat(song.getCustom("difficulty")).isEqualTo("Easy");
       assertThat(song.getCustom("spotify_url")).isEqualTo("https://open.spotify.com/track/5zADxJhJEzuOstzcUtXlXv?si=SN6U1oveQ7KNfhtD2NHf9A");
     }
+
+    @Test
+    public void itParsesChordsAndLyrics() {
+      Song song = SongPro.parse("[G]Don't go 'round tonight");
+
+      assertThat(song.getSections().size()).isEqualTo(1);
+      assertThat(song.getSections().get(0).getLines().size()).isEqualTo(1);
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().size()).isEqualTo(1);
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().get(0).getChord()).isEqualTo("G");
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().get(0).getLyric()).isEqualTo("Don't go 'round tonight");
+    }
+
+    @Test
+    public void itParsesLyricsBeforeChords() {
+      Song song = SongPro.parse("It's [D]bound to take your life");
+
+      assertThat(song.getSections().size()).isEqualTo(1);
+      assertThat(song.getSections().get(0).getLines().size()).isEqualTo(1);
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().size()).isEqualTo(2);
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().get(0).getChord()).isEqualTo("");
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().get(0).getLyric()).isEqualTo("It's ");
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().get(1).getChord()).isEqualTo("D");
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().get(1).getLyric()).isEqualTo("bound to take your life");
+    }
   }
 }

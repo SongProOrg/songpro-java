@@ -1,6 +1,8 @@
 package org.songpro;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Song {
@@ -13,6 +15,7 @@ public class Song {
   private String album;
   private String tuning;
   private Map<String, String> customAttributes = new HashMap<>();
+  private List<Section> sections = new ArrayList<>();
 
   public String getTitle() {
     return title;
@@ -84,5 +87,9 @@ public class Song {
 
   public void setCustomAttribute(String key, String value) {
     customAttributes.put(key, value);
+  }
+
+  public List<Section> getSections() {
+    return this.sections;
   }
 }
