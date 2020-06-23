@@ -1,6 +1,5 @@
 package org.songpro;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -9,27 +8,42 @@ import java.util.regex.Pattern;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
 public class SongPro {
+  private final static Pattern SECTION_REGEX = Pattern.compile("#\\s*([^$]*)");
   private final static Pattern ATTRIBUTE_PATTERN = Pattern.compile("@(\\w*)=([^%]*)");
   private final static Pattern CUSTOM_ATTRIBUTE_PATTERN = Pattern.compile("!(\\w*)=([^%]*)");
   private final static Pattern CHORDS_AND_LYRICS_REGEX = Pattern.compile("(\\[[\\w#b/]+])?([^\\[]*)", CASE_INSENSITIVE);
 
-  public static Song parse(String text) {
+
+  public static Song parse(String songpro) {
     Song song = new Song();
     Section currentSection = null;
 
-    List<String> lines = Arrays.asList(text.split("\n"));
+    List<String> lines = Arrays.asList(songpro.split("\n"));
 
-    lines.forEach((line) -> {
-      if (line.startsWith("@")) {
-        processAttribute(song, line);
-      } else if (line.startsWith("!")) {
-        processCustomAttribute(song, line);
+    lines.forEach((text) -> {
+      if (text.startsWith("@")) {
+        processAttribute(song, text);
+      } else if (text.startsWith("!")) {
+        processCustomAttribute(song, text);
+      } else if (text.startsWith("#")) {
+        processSection(song, currentSection, text);
       } else {
         processLyricsAndChords(song, currentSection, text);
       }
     });
 
     return song;
+  }
+
+  private static void processSection(Song song, Section currentSection, String text) {
+    Matcher matcher = SECTION_REGEX.matcher(text);
+
+    if (matcher.matches()) {
+      String name = matcher.group(1).trim();
+      currentSection = new Section();
+      currentSection.setName(name);
+      song.getSections().add(currentSection);
+    }
   }
 
   private static void processLyricsAndChords(Song song, Section currentSection, String text) {

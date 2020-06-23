@@ -6,11 +6,13 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class SongProTest {
+  private Song song;
+
   @Nested
   class Parse {
     @Test
     public void itParsesAttributes() {
-      Song song = SongPro.parse(
+      song = SongPro.parse(
           "@title=Bad Moon Rising\n" +
               "@artist=Creedence Clearwater Revival\n" +
               "@capo=1st Fret\n" +
@@ -33,7 +35,7 @@ public class SongProTest {
 
     @Test
     public void itParsesCustomAttributes() {
-      Song song = SongPro.parse(
+      song = SongPro.parse(
           "!difficulty=Easy\n" +
               "!spotify_url=https://open.spotify.com/track/5zADxJhJEzuOstzcUtXlXv?si=SN6U1oveQ7KNfhtD2NHf9A\n"
       );
@@ -43,8 +45,28 @@ public class SongProTest {
     }
 
     @Test
+    public void itParsesSectionNames() {
+      song = SongPro.parse("# Verse 1");
+
+      assertThat(song.getSections().size()).isEqualTo(1);
+      assertThat(song.getSections().get(0).getName()).isEqualTo("Verse 1");
+    }
+
+    @Test
+    public void itParsesMultipleSectionNames() {
+      song = SongPro.parse(
+          "# Verse 1\n" +
+              "# Chorus\n"
+      );
+      
+      assertThat(song.getSections().size()).isEqualTo(2);
+      assertThat(song.getSections().get(0).getName()).isEqualTo("Verse 1");
+      assertThat(song.getSections().get(1).getName()).isEqualTo("Chorus");
+    }
+
+    @Test
     public void itParsesChordsAndLyrics() {
-      Song song = SongPro.parse("[G]Don't go 'round tonight");
+      song = SongPro.parse("[G]Don't go 'round tonight");
 
       assertThat(song.getSections().size()).isEqualTo(1);
       assertThat(song.getSections().get(0).getLines().size()).isEqualTo(1);
@@ -55,7 +77,7 @@ public class SongProTest {
 
     @Test
     public void itParsesLyricsBeforeChords() {
-      Song song = SongPro.parse("It's [D]bound to take your life");
+      song = SongPro.parse("It's [D]bound to take your life");
 
       assertThat(song.getSections().size()).isEqualTo(1);
       assertThat(song.getSections().get(0).getLines().size()).isEqualTo(1);
@@ -64,6 +86,21 @@ public class SongProTest {
       assertThat(song.getSections().get(0).getLines().get(0).getParts().get(0).getLyric()).isEqualTo("It's ");
       assertThat(song.getSections().get(0).getLines().get(0).getParts().get(1).getChord()).isEqualTo("D");
       assertThat(song.getSections().get(0).getLines().get(0).getParts().get(1).getLyric()).isEqualTo("bound to take your life");
+    }
+
+    @Test
+    public void itParsesLyricsBeforeAndAfterChords() {
+      song = SongPro.parse("It's a[D]bout a [E]boy");
+
+      assertThat(song.getSections().size()).isEqualTo(1);
+      assertThat(song.getSections().get(0).getLines().size()).isEqualTo(1);
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().size()).isEqualTo(3);
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().get(0).getChord()).isEqualTo("");
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().get(0).getLyric()).isEqualTo("It's a");
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().get(1).getChord()).isEqualTo("D");
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().get(1).getLyric()).isEqualTo("bout a ");
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().get(2).getChord()).isEqualTo("E");
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().get(2).getLyric()).isEqualTo("boy");
     }
   }
 }
