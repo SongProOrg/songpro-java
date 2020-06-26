@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.songpro</groupId>
-    <artifactId>songro-java</artifactId>
+    <artifactId>songpro-java</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
