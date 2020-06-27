@@ -59,7 +59,9 @@ public class SongPro {
 
     Line line = new Line();
 
-    if (text.startsWith(">")) {
+    if (text.startsWith("|-")) {
+      line.setTablature(text);
+    } else if (text.startsWith(">")) {
       Matcher matcher = COMMENT_REGEX.matcher(text);
 
       if (matcher.matches()) {

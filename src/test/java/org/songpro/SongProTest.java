@@ -139,7 +139,18 @@ public class SongProTest {
       assertThat(song.getSections().get(0).getLines().get(0).getParts().get(2).getChord()).isEqualTo("E");
       assertThat(song.getSections().get(0).getLines().get(0).getParts().get(2).getLyric()).isEqualTo("boy");
     }
+    
+    @Test
+    public void itParsesTablature() {
+      song = SongPro.parse("# Riff\n|-3---5-|\n|---4---|\n");
 
+      assertThat(song.getSections().size()).isEqualTo(1);
+      assertThat(song.getSections().get(0).getLines().get(0).hasTablature()).isEqualTo(true);
+      assertThat(song.getSections().get(0).getLines().get(0).getTablature()).isEqualTo("|-3---5-|");
+      assertThat(song.getSections().get(0).getLines().get(1).hasTablature()).isEqualTo(true);
+      assertThat(song.getSections().get(0).getLines().get(1).getTablature()).isEqualTo("|---4---|");
+    }
+    
     @Test
     public void itParsesComments() {
       song = SongPro.parse("# Comment\n> This is a comment.\n");
