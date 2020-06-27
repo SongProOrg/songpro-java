@@ -14,8 +14,13 @@ public class Song {
   private String year;
   private String album;
   private String tuning;
-  private Map<String, String> customAttributes = new HashMap<>();
-  private List<Section> sections = new ArrayList<>();
+  private Map<String, String> customAttributes;
+  private List<Section> sections;
+
+  public Song() {
+    sections = new ArrayList<>();
+    customAttributes = new HashMap<>();
+  }
 
   public String getTitle() {
     return title;

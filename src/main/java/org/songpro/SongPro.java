@@ -34,8 +34,7 @@ public class SongPro {
   private static Section processSection(Song song, String text) {
     Matcher matcher = SECTION_REGEX.matcher(text);
 
-    Section currentSection = new Section();
-    currentSection.setName("");
+    Section currentSection = new Section("");
 
     if (matcher.matches()) {
       String name = matcher.group(1).trim();
@@ -52,8 +51,7 @@ public class SongPro {
     }
 
     if (currentSection == null) {
-      currentSection = new Section();
-      currentSection.setName("");
+      currentSection = new Section("");
       song.getSections().add(currentSection);
     }
 
@@ -142,5 +140,4 @@ public class SongPro {
       song.setCustomAttribute(key, value);
     }
   }
-
 }

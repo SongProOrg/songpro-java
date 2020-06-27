@@ -5,7 +5,12 @@ import java.util.List;
 
 public class Section {
   private String name;
-  private List<Line> lines = new ArrayList<>();
+  private List<Line> lines;
+
+  public Section(String name) {
+    this.name = name;
+    this.lines = new ArrayList<>();
+  }
 
   public List<Line> getLines() {
     return this.lines;

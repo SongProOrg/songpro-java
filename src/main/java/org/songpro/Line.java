@@ -4,9 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Line {
-  private List<Part> parts = new ArrayList<>();
+  private List<Part> parts;
   private String comment;
   private String tablature;
+
+  public Line() {
+    this.parts = new ArrayList<>();
+  }
 
   public List<Part> getParts() {
     return this.parts;
