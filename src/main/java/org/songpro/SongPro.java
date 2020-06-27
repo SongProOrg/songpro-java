@@ -1,7 +1,5 @@
 package org.songpro;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,38 +10,40 @@ public class SongPro {
   private final static Pattern ATTRIBUTE_PATTERN = Pattern.compile("@(\\w*)=([^%]*)");
   private final static Pattern CUSTOM_ATTRIBUTE_PATTERN = Pattern.compile("!(\\w*)=([^%]*)");
   private final static Pattern CHORDS_AND_LYRICS_REGEX = Pattern.compile("(\\[[\\w#b/]+])?([^\\[]*)", CASE_INSENSITIVE);
+  private final static Pattern COMMENT_REGEX = Pattern.compile(">\\s*([^$]*)");
 
-
-  public static Song parse(String songpro) {
+  public static Song parse(String lines) {
     Song song = new Song();
     Section currentSection = null;
 
-    List<String> lines = Arrays.asList(songpro.split("\n"));
-
-    lines.forEach((text) -> {
+    for (String text : lines.split("\n")) {
       if (text.startsWith("@")) {
         processAttribute(song, text);
       } else if (text.startsWith("!")) {
         processCustomAttribute(song, text);
       } else if (text.startsWith("#")) {
-        processSection(song, currentSection, text);
+        currentSection = processSection(song, text);
       } else {
         processLyricsAndChords(song, currentSection, text);
       }
-    });
+    }
 
     return song;
   }
 
-  private static void processSection(Song song, Section currentSection, String text) {
+  private static Section processSection(Song song, String text) {
     Matcher matcher = SECTION_REGEX.matcher(text);
+
+    Section currentSection = new Section();
+    currentSection.setName("");
 
     if (matcher.matches()) {
       String name = matcher.group(1).trim();
-      currentSection = new Section();
       currentSection.setName(name);
       song.getSections().add(currentSection);
     }
+
+    return currentSection;
   }
 
   private static void processLyricsAndChords(Song song, Section currentSection, String text) {
@@ -53,41 +53,44 @@ public class SongPro {
 
     if (currentSection == null) {
       currentSection = new Section();
+      currentSection.setName("");
       song.getSections().add(currentSection);
     }
 
     Line line = new Line();
 
-    Matcher matcher = CHORDS_AND_LYRICS_REGEX.matcher(text);
+    if (text.startsWith(">")) {
+      Matcher matcher = COMMENT_REGEX.matcher(text);
 
-    while (matcher.find()) {
-      if (matcher.groupCount() == 2) {
-        Part part = new Part();
+      if (matcher.matches()) {
+        String comment = matcher.group(1).trim();
+        line.setComment(comment);
+      }
+    } else {
+      Matcher matcher = CHORDS_AND_LYRICS_REGEX.matcher(text);
 
-        if (matcher.group(1) != null) {
-          part.setChord(matcher.group(1).trim().replace("[", "").replace("]", ""));
-        } else {
-          part.setChord("");
-        }
+      while (matcher.find()) {
+        if (matcher.groupCount() == 2) {
+          Part part = new Part();
 
-        if (!matcher.group(2).equals("")) {
-          part.setLyric(matcher.group(2));
-        } else {
-          part.setLyric("");
-        }
+          if (matcher.group(1) != null) {
+            part.setChord(matcher.group(1).trim().replace("[", "").replace("]", ""));
+          } else {
+            part.setChord("");
+          }
 
-        if (!(part.getChord().equals("") && part.getLyric().equals(""))) {
-          line.getParts().add(part);
+          if (!matcher.group(2).equals("")) {
+            part.setLyric(matcher.group(2));
+          } else {
+            part.setLyric("");
+          }
+
+          if (!(part.getChord().equals("") && part.getLyric().equals(""))) {
+            line.getParts().add(part);
+          }
         }
       }
     }
-//    captures.each_slice(2) do |pair|
-//        part = Part.new
-//        chord = pair[0]&.strip || ''
-//        part.chord = chord.delete('[').delete(']')
-//        part.lyric = pair[1] || ''
-//
-//    line.parts << part unless (part.chord == '') && (part.lyric == '')
 
     currentSection.getLines().add(line);
   }

@@ -139,5 +139,14 @@ public class SongProTest {
       assertThat(song.getSections().get(0).getLines().get(0).getParts().get(2).getChord()).isEqualTo("E");
       assertThat(song.getSections().get(0).getLines().get(0).getParts().get(2).getLyric()).isEqualTo("boy");
     }
+
+    @Test
+    public void itParsesComments() {
+      song = SongPro.parse("# Comment\n> This is a comment.\n");
+
+      assertThat(song.getSections().size()).isEqualTo(1);
+      assertThat(song.getSections().get(0).getLines().get(0).hasComment()).isEqualTo(true);
+      assertThat(song.getSections().get(0).getLines().get(0).getComment()).isEqualTo("This is a comment.");
+    }
   }
 }
