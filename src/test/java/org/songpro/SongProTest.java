@@ -58,10 +58,47 @@ public class SongProTest {
           "# Verse 1\n" +
               "# Chorus\n"
       );
-      
+
       assertThat(song.getSections().size()).isEqualTo(2);
       assertThat(song.getSections().get(0).getName()).isEqualTo("Verse 1");
       assertThat(song.getSections().get(1).getName()).isEqualTo("Chorus");
+    }
+
+    @Test
+    public void itParsesLyrics() {
+      song = SongPro.parse("I don't see! a bad, moon a-rising. (a-rising)");
+
+      assertThat(song.getSections().size()).isEqualTo(1);
+      assertThat(song.getSections().get(0).getLines().size()).isEqualTo(1);
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().size()).isEqualTo(1);
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().get(0).getLyric()).isEqualTo("I don't see! a bad, moon a-rising. (a-rising)");
+    }
+
+    @Test
+    public void itParsesSpecialCharacters() {
+      song = SongPro.parse("singing sömething with Röck dots");
+
+      assertThat(song.getSections().size()).isEqualTo(1);
+      assertThat(song.getSections().get(0).getLines().size()).isEqualTo(1);
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().size()).isEqualTo(1);
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().get(0).getLyric()).isEqualTo("singing sömething with Röck dots");
+    }
+
+    @Test
+    public void itParsesChords() {
+      song = SongPro.parse("[D] [D/F#] [C] [A7]");
+
+      assertThat(song.getSections().size()).isEqualTo(1);
+      assertThat(song.getSections().get(0).getLines().size()).isEqualTo(1);
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().size()).isEqualTo(4);
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().get(0).getChord()).isEqualTo("D");
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().get(0).getLyric()).isEqualTo(" ");
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().get(1).getChord()).isEqualTo("D/F#");
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().get(1).getLyric()).isEqualTo(" ");
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().get(2).getChord()).isEqualTo("C");
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().get(2).getLyric()).isEqualTo(" ");
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().get(3).getChord()).isEqualTo("A7");
+      assertThat(song.getSections().get(0).getLines().get(0).getParts().get(3).getLyric()).isEqualTo("");
     }
 
     @Test
