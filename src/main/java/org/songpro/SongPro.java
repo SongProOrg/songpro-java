@@ -1,5 +1,10 @@
 package org.songpro;
 
+import org.songpro.models.Line;
+import org.songpro.models.Part;
+import org.songpro.models.Section;
+import org.songpro.models.Song;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

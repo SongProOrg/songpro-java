@@ -2,6 +2,7 @@ package org.songpro;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.songpro.models.Song;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

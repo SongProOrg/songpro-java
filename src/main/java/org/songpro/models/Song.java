@@ -1,4 +1,4 @@
-package org.songpro;
+package org.songpro.models;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package org.songpro;
+package org.songpro.models;
 
 public class Part {
   private String chord;
