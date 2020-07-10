@@ -1,4 +1,4 @@
-# songpro-java ![Build](https://github.com/SongProOrg/songpro-java/workflows/Build/badge.svg)
+# SongPro for Java ![Build](https://github.com/SongProOrg/songpro-java/workflows/Build/badge.svg)
 
 [SongPro](https://songpro.org) is a text format for transcribing songs.
  
