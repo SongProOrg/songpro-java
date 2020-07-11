@@ -1,13 +1,19 @@
 package org.songpro;
 
 import org.songpro.models.Line;
+import org.songpro.models.Measure;
 import org.songpro.models.Part;
 import org.songpro.models.Section;
 import org.songpro.models.Song;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.Collections.singletonList;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
 public class SongPro {
@@ -16,6 +22,8 @@ public class SongPro {
   private final static Pattern CUSTOM_ATTRIBUTE_PATTERN = Pattern.compile("!(\\w*)=([^%]*)");
   private final static Pattern CHORDS_AND_LYRICS_REGEX = Pattern.compile("(\\[[\\w#b/]+])?([^\\[]*)", CASE_INSENSITIVE);
   private final static Pattern COMMENT_REGEX = Pattern.compile(">\\s*([^$]*)");
+  private final static Pattern MEASURES_REGEX = Pattern.compile("([\\[[\\w#b\\/]+\\]\\s]+)[|]*", CASE_INSENSITIVE);
+  private final static Pattern CHORDS_REGEX = Pattern.compile("\\[([\\w#b\\/]+)\\]?", CASE_INSENSITIVE);
 
   public static Song parse(String lines) {
     Song song = new Song();
@@ -64,6 +72,25 @@ public class SongPro {
 
     if (text.startsWith("|-")) {
       line.setTablature(text);
+    } else if (text.startsWith("| ")) {
+      Matcher matcher = MEASURES_REGEX.matcher(text);
+      List<Measure> measures = new ArrayList<>();
+
+      while (matcher.find()) {
+        Matcher chordMatcher = CHORDS_REGEX.matcher(matcher.group(1));
+
+        Measure measure = new Measure();
+        List<String> chords = new ArrayList<>();
+        while (chordMatcher.find()) {
+          chords.add(chordMatcher.group(1));
+        }
+        measure.setChords(chords);
+        measures.add(measure);
+
+      }
+
+      line.setMeasures(measures);
+
     } else if (text.startsWith(">")) {
       Matcher matcher = COMMENT_REGEX.matcher(text);
 
@@ -142,7 +169,7 @@ public class SongPro {
       String key = matcher.group(1);
       String value = matcher.group(2).replace("\n", "");
 
-      song.setCustomAttribute(key, value);
+      song.setCustom(key, value);
     }
   }
 }

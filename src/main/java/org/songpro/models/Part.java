@@ -1,5 +1,8 @@
 package org.songpro.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Part {
   private String chord;
   private String lyric;

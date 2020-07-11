@@ -1,10 +1,14 @@
 package org.songpro.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Song {
   private String title;
   private String artist;
@@ -14,12 +18,14 @@ public class Song {
   private String year;
   private String album;
   private String tuning;
-  private Map<String, String> customAttributes;
+
+  @JsonProperty("custom")
+  private Map<String, String> custom;
   private List<Section> sections;
 
   public Song() {
     sections = new ArrayList<>();
-    customAttributes = new HashMap<>();
+    custom = new HashMap<>();
   }
 
   public String getTitle() {
@@ -87,11 +93,11 @@ public class Song {
   }
 
   public String getCustom(String key) {
-    return customAttributes.get(key);
+    return custom.get(key);
   }
 
-  public void setCustomAttribute(String key, String value) {
-    customAttributes.put(key, value);
+  public void setCustom(String key, String value) {
+    custom.put(key, value);
   }
 
   public List<Section> getSections() {

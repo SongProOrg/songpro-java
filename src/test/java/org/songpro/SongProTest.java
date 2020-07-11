@@ -1,10 +1,20 @@
 package org.songpro;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.songpro.models.Song;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
+import static java.lang.String.valueOf;
+import static java.nio.file.Paths.get;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.util.Arrays.asList;
 
 public class SongProTest {
   private Song song;
@@ -140,6 +150,18 @@ public class SongProTest {
       assertThat(song.getSections().get(0).getLines().get(0).getParts().get(2).getChord()).isEqualTo("E");
       assertThat(song.getSections().get(0).getLines().get(0).getParts().get(2).getLyric()).isEqualTo("boy");
     }
+
+    @Test
+    public void itParsesChordOnlyMeasures() {
+      song = SongPro.parse("# Instrumental\n| [A] [B] | [C] | [D] [E] [F] [G] |");
+
+      assertThat(song.getSections().size()).isEqualTo(1);
+      assertThat(song.getSections().get(0).getLines().get(0).hasMeasures()).isEqualTo(true);
+      assertThat(song.getSections().get(0).getLines().get(0).getMeasures().size()).isEqualTo(3);
+      assertThat(song.getSections().get(0).getLines().get(0).getMeasures().get(0).getChords()).isEqualTo(asList(new String[]{"A", "B"}));
+      assertThat(song.getSections().get(0).getLines().get(0).getMeasures().get(1).getChords()).isEqualTo(asList(new String[]{"C"}));
+      assertThat(song.getSections().get(0).getLines().get(0).getMeasures().get(2).getChords()).isEqualTo(asList(new String[]{"D", "E", "F", "G"}));
+    }
     
     @Test
     public void itParsesTablature() {
@@ -160,5 +182,34 @@ public class SongProTest {
       assertThat(song.getSections().get(0).getLines().get(0).hasComment()).isEqualTo(true);
       assertThat(song.getSections().get(0).getLines().get(0).getComment()).isEqualTo("This is a comment.");
     }
+
+    @Test
+    public void itConvertsToJson() {
+      ObjectMapper objectMapper = new ObjectMapper();
+      String text = getTestResource("bad-moon-rising.sng");
+      String expectedJson = getTestResource("bad-moon-rising.json");
+
+      song = SongPro.parse(text);
+
+      try {
+        String actualJson = objectMapper.writeValueAsString(song);
+
+        Song actualSong = objectMapper.readValue(actualJson, Song.class);
+        Song expectedSong = objectMapper.readValue(expectedJson, Song.class);
+
+        assertThat(objectMapper.writeValueAsString(actualSong)).isEqualTo(objectMapper.writeValueAsString(expectedSong));
+      } catch (JsonProcessingException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  private String getTestResource(String path) {
+    try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(path)) {
+      return IOUtils.toString(inputStream, valueOf(StandardCharsets.UTF_8));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return "";
   }
 }
